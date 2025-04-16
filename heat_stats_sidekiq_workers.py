@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3 -s
 
 import argparse
 from datetime import *

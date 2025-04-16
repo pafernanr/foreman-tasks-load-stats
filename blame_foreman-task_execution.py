@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3 -s
 
 from copy import deepcopy
 import argparse
