@@ -4,7 +4,7 @@
 
 import argparse
 import re
-from datetime import *
+from datetime import datetime
 from os.path import isfile, isdir, join
 
 parser = argparse.ArgumentParser(description="Dynflow polling checker against "

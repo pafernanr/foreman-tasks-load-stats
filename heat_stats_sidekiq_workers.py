@@ -1,13 +1,11 @@
 #!/usr/bin/python3 -s
 
 import argparse
-from datetime import *
-from dateutil.tz import tzutc
+from datetime import datetime
 
 intervals = []
 timestamps = set()
-utctz = tzutc()
-now = datetime.now().replace(tzinfo=utctz).timestamp()
+now = datetime.now().timestamp()
 
 
 def _convert_date_time_to_seconds(ts):
@@ -17,7 +15,7 @@ def _convert_date_time_to_seconds(ts):
                 "%Y-%m-%d"]:
         try:
             ret = datetime.strptime(ts, fmt) \
-                          .replace(tzinfo=utctz).timestamp()
+                          .timestamp()
         except ValueError:
             pass
         if ret:
@@ -166,7 +164,7 @@ fname = f"{args.dynflow_steps}.sidekiq_load.csv"
 with open(fname, "w") as _file:
     _file.write("start;duration;concur.steps;avg.exec.load\n")
     for ts in heat_intervals.keys():
-        ts_out = datetime.fromtimestamp(ts, timezone.utc)
+        ts_out = datetime.fromtimestamp(ts)
         _file.write(f"{ts_out.isoformat('T', 'microseconds')};"
                     f"{heat_intervals[ts]['end']-ts};"
                     f"{heat_intervals[ts]['steps']};"
@@ -184,7 +182,7 @@ if args.show_graph:
               "package.")
         exit()
     print("Generating heat graph of dynflow/sidekiq usage..")
-    timestamps = [datetime.fromtimestamp(ts, timezone.utc)
+    timestamps = [datetime.fromtimestamp(ts)
                   for ts in heat_intervals.keys()]
     steps = [val['steps'] for val in heat_intervals.values()]
     loads = [val['load'] for val in heat_intervals.values()]

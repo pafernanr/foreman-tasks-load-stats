@@ -6,8 +6,7 @@ import json
 import csv
 import sys
 import os
-from datetime import *
-from dateutil.tz import tzutc
+from datetime import datetime
 
 # increase a csv buffer size to prevent "field larger than field limit" error
 # when processing too long fields
@@ -21,17 +20,16 @@ while True:
     except OverflowError:
         maxInt = int(maxInt/10)
 
-utctz = tzutc()
-now = datetime.now().replace(tzinfo=utctz).timestamp()
+now = datetime.now().timestamp()
 
 
 def _convert_datetime_to_seconds(ts):
     try:
         ret = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S.%f") \
-                      .replace(tzinfo=utctz).timestamp()
+                      .timestamp()
     except ValueError:
         ret = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S") \
-                      .replace(tzinfo=utctz).timestamp()
+                      .timestamp()
     return ret
 
 
