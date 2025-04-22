@@ -201,6 +201,8 @@ with open(dynflow_actions_fname, newline='') as _file:
         # pulp tasks
         if 'pulp_tasks' in data:
             for task in data['pulp_tasks']:
+                if task == "task":
+                    continue
                 if task.keys() >= {'pulp_created', 'started_at', 'finished_at'}:
                     process_external_task(step_id, 'pulp',
                                           task['pulp_created'][:23],
