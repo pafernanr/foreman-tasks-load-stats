@@ -129,7 +129,10 @@ for start, finish, exectime, label in intervals:
         labels[label] = {'count': 0, 'exectime': 0.0}
     labels[label]['count'] += 1
     labels[label]['exectime'] += exectime
-    load = exectime / (finish-start)
+    try:
+        load = exectime / (finish-start)
+    except ZeroDivisionError:
+        load = 0
     ts = start
     while finish > heat_intervals[ts]['end']:
         heat_intervals[ts]['steps'] += 1
