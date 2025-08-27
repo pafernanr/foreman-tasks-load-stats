@@ -245,29 +245,30 @@ for step_id in steps_times.keys():
             continue
         exec2real = exectime/realtime
         # while there is an action within this sidekiq interval..
-        while ended_at > action_intervals[step_id][0][0]:
-            # blame sidekiq for period prior the external action
-            if started_at < action_intervals[step_id][0][0]:
-                duration = action_intervals[step_id][0][0]-started_at
-                blame_periods.add((started_at, duration, 'sidewait',
-                                   1-exec2real))
-                blame_periods.add((started_at, duration, 'sideexec',
-                                   exec2real))
-            # now blame pulp/candlepin and sideexec - nowadays, we treat both
-            # of them fully concurrently, not interfering each other "blame"
-            # or weight. This approach alone could mean simplier code but the
-            # current code is prepared for a variant "blame them with proper"
-            # weights" (since sideexec might affect pulp/candlepin..?)
-            blame_periods.add((action_intervals[step_id][0][0],
-                               action_intervals[step_id][0][1],
-                               action_intervals[step_id][0][2], 1))
-            blame_periods.add((action_intervals[step_id][0][0],
-                               action_intervals[step_id][0][1],
-                               'sideexec', exec2real))
-            # move in time beyond the action
-            started_at = action_intervals[step_id][0][0] + \
-                action_intervals[step_id][0][1]
-            action_intervals[step_id].pop(0)
+        if isinstance(action_intervals[step_id][0][0], list):
+            while ended_at > action_intervals[step_id][0][0]:
+                # blame sidekiq for period prior the external action
+                if started_at < action_intervals[step_id][0][0]:
+                    duration = action_intervals[step_id][0][0]-started_at
+                    blame_periods.add((started_at, duration, 'sidewait',
+                                       1-exec2real))
+                    blame_periods.add((started_at, duration, 'sideexec',
+                                       exec2real))
+                # now blame pulp/candlepin and sideexec - nowadays, we treat both
+                # of them fully concurrently, not interfering each other "blame"
+                # or weight. This approach alone could mean simplier code but the
+                # current code is prepared for a variant "blame them with proper"
+                # weights" (since sideexec might affect pulp/candlepin..?)
+                blame_periods.add((action_intervals[step_id][0][0],
+                                   action_intervals[step_id][0][1],
+                                   action_intervals[step_id][0][2], 1))
+                blame_periods.add((action_intervals[step_id][0][0],
+                                   action_intervals[step_id][0][1],
+                                   'sideexec', exec2real))
+                # move in time beyond the action
+                started_at = action_intervals[step_id][0][0] + \
+                    action_intervals[step_id][0][1]
+                action_intervals[step_id].pop(0)
         # if there is a trailing time spent by sidekiq, blame for it
         if started_at < ended_at:
             duration = ended_at-started_at
